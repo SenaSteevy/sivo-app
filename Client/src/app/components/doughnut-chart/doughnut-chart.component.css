@@ -1,0 +1,15 @@
+.container{
+  width : inherit;
+  height: inherit;
+  position: relative; 
+  display: inline-block;
+}
+
+.chart-center {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: bold;
+  }

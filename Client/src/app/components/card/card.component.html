@@ -1,0 +1,14 @@
+
+<div class="card" fxFlex fxLayout="column"  [@pulseAnimation]="cardState" (mouseenter)="startAnimation()" (mouseleave)="stopAnimation()"> 
+    
+    <img fxFlex="80%" class="card-image" [src]="image" [alt]="title" loading="lazy">
+    
+    <div fxFlex="20%"  class="title" fxFlex fxLayoutGap="10px" fxLayoutAlign="center center" >
+        <mat-icon>{{icon}}</mat-icon> 
+        <h3>{{title}}</h3>
+    </div>
+    
+    <div class="content" *ngIf="onHover" @slideAnimation fxFlex fxLayout="column" fxLayoutAlign="end center">
+        <p>{{description}}</p>
+    </div>
+</div>

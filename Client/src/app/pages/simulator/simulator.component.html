@@ -1,0 +1,95 @@
+<div *ngIf="showExcelImage" class="image-container" >
+    <div class="excel-image"   fxFlex fxLayout="column" fxLayoutAlign="start center">
+        <img src="../../../assets/images/excel-preview.png"  width="100%" height="90%" alt="Excel image format needed" loading="lazy" style="object-fit: cover;">
+        <button class="button" mat-button (click)="showExcelImage=false"><span style="color:rgb(63, 76, 196)">Ok</span></button>
+    </div>
+</div>
+
+<div class="container"  fxFlex fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start center">
+    
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+        <mat-icon>play_arrow</mat-icon>
+        <h3>Planning Simulator</h3>
+      </div>
+    
+    <div class="card" >
+        
+        <mat-horizontal-stepper linear #stepper="matHorizontalStepper">
+            <mat-step label="New Simulation" >
+                <div fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
+                    <span style="width:30%">Make a new Simulation Test By uploading a file of orders to be scheduled.</span>
+                    <button class="button" mat-raised-button color="primary" matStepperNext>
+                        <mat-icon>play_arrow</mat-icon>
+                        Start
+                    </button>
+                </div>
+                </mat-step>
+
+                <mat-step label="Before doing">
+                    <div fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <span style="width:50%; text-justify:auto;">Before going next, make sure your file is an Excel format file (.xlsx) and has at the first sheet at least the columns as showed by the following picture.  </span>   
+                        <button mat-button (click)="showExcelImage=true">
+                            <mat-icon class="image-preview" color="primary">visibility</mat-icon>
+                        </button>
+                        <button class="button" mat-raised-button color="primary" matStepperNext>
+                            Next
+                        </button>
+                        <button class="button" mat-raised-button color="warn" (click)="stepper.reset()">
+                            Cancel
+                        </button>
+                    </div>
+
+                </mat-step>
+
+                <mat-step label="upload file" [stepControl]="uploadForm">
+                    <div fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center" fxLayoutGap="20px">
+                        <span style="width:50%; justify-content: center;">Upload the excel file of orders to be scheduled...</span>   
+                       
+                        <form [formGroup]="uploadForm" fxFlex fxLayout="column" fxLayoutAlign="start center" >
+                            <div fxFlex fxLayout="row">
+
+                                <input type="file" formControlName="file" (change)="onFileSelected($event)" accept=".xlsx" style="display: none" #fileInput>
+                                <button class="button" mat-button color="primary" (click)="fileInput.click()">
+                                    <mat-icon>upload</mat-icon>
+                                    Upload
+                                </button>
+                                <mat-error *ngIf="!uploadForm.valid && !!uploadForm.get('file')?.value" >Please upload an Excel file.</mat-error>
+                            </div>
+
+                            <div fxFlex fxLayout="row">
+                                <button class="button" type="submit" mat-raised-button color="primary"(click)="sendUploadedFile()"  matStepperNext *ngIf="!!uploadForm.get('file')?.value">Next</button>
+                                <button class="button" mat-raised-button color="warn" (click)="stepper.reset()">Cancel</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </mat-step>
+
+                <mat-step label="Planification">
+                    <div fxFlex fxLayout="column" fxLayoutAlign="start center"  fxLayoutGap="20px">
+                        <div *ngIf="loading" #noPlanning fxFlex fxLayoutAlign="center center">
+                            <p>Fill the previous step first.</p>                  
+                        </div>
+                        
+                        <div fxFlex fxLayout="column" fxLayoutGap="10px" *ngIf="!!loading && !error">
+                            <span>Scheduling in process ...</span>   
+                        </div>
+                        <div fxFlex fxLayout="column" fxLayoutGap="10px" *ngIf="error">
+                            <span style=" color : rgb(223, 49, 49)">An error occured during the planification. Please try again or call an administrator if the problem persist.<br> </span>   
+                        </div>
+
+                        <div fxFlex fxLayout="column" fxLayoutGap="10px" *ngIf="!error" fxLayoutAlign="center center">
+                            <app-lottie-animation-view *ngIf="loading"  [iconWidth]="'30vw'" [iconHeight]="'10vh'" animationPath="loading.json" [loop]="true"></app-lottie-animation-view>
+                            <app-lottie-animation-view *ngIf="!!plannedFile" [iconWidth]="'30vw'" [iconHeight]="'10vh'" animationPath="good-rate.json" [loop]="true"></app-lottie-animation-view> 
+                            <span *ngIf="!!plannedFile">Your planning is ready</span> 
+                            
+                           <button mat-raised-button *ngIf="!!plannedFile" (click)="downloadFile()">
+                                <mat-icon>download</mat-icon>
+                                Download
+                            </button>   
+                        </div>                        
+                    </div>
+                </mat-step>
+          </mat-horizontal-stepper>
+    </div>
+</div>

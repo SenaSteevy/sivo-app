@@ -1,0 +1,39 @@
+<div class="user-form-container" fxFlex fxLayout.lt-md="column" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+    <div fxFlex="70%" fxFlex fxLayout="column" fxLayoutGap="5px" >
+      <form [formGroup]="resourceForm"  (ngSubmit)="saveResource()"  fxFlex fxLayout="row wrap" fxLayoutAlign.lt-md="center center" fxLayout.lt-sm="column" fxLayoutGap="5px">
+        
+      
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Name</mat-label>
+          <input matInput type="text" name="name" placeholder="Name" formControlName = "name" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Type</mat-label>
+          <input matInput type="text" name="type" placeholder="Type" formControlName = "type">
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" >
+          <mat-label>Quantity in Stock</mat-label>
+          <input matInput type="number" name="quantity" placeholder="quantity" formControlName = "quantity">
+        </mat-form-field>
+
+      </form>
+      
+    
+      <div class="actions" fxFlex fxLayoutAlign="center center" >
+        <button class="button" *ngIf="!isResourcesPage" mat-raised-button  [disabled]="resourceForm.invalid" type="submit" (click)="saveResource()" color="primary">{{!resource? "Save New Resource":"Save changes"}}</button>
+        <button class="button" *ngIf="!!resource && !isResourcesPage" mat-raised-button   type="reset" (click)="initializeForm()" color="accent">Reset changes</button>
+        <button class="button" *ngIf="isResourcesPage" mat-raised-button color="primary" [routerLink]=" resource.id+'/edit'">
+          <mat-icon> edit</mat-icon>
+          Edit Resource
+        </button>
+        <button class="button" *ngIf="isResourcesPage" mat-raised-button color="warn" (click)="deleteResource()">
+          <mat-icon>delete</mat-icon>
+          Delete Resource
+        </button>
+      </div>
+    </div>
+</div>

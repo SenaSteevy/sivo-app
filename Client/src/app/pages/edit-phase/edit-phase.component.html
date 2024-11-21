@@ -1,0 +1,13 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" class="title">
+        <mat-icon>settings_input_component</mat-icon>
+        <h3>Phases > {{phase? "Modify  phase ID "+phase.id : "New Phase"}} </h3>
+      </div>
+
+      <div>
+        <app-phase-form *ngIf="phase" [phase]="phase"></app-phase-form>
+        <app-phase-form *ngIf="!phase" ></app-phase-form>
+
+      </div>
+
+</div>

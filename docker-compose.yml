@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_PORT: 3306
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  user-service:
+    image: user_service
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/userDB
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+
+  ordo-service:
+    image: ordo_service
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sivoJobDB
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+    ports:
+      - "8083:8083"
+    networks:
+      - app-network
+
+  angular:
+    image: web
+    depends_on:
+      - user-service
+      - ordo-service
+    ports:
+      - "4200:4200"
+    networks:
+      - app-network
+
+networks:
+  app-network:

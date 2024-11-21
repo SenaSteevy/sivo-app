@@ -1,0 +1,29 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="20px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+        <mat-icon >accessibility</mat-icon> 
+        <h3>About Roles</h3>
+    </div>
+    
+    <div fxFlex fxLayout="row wrap" fxLayoutGap="20px" *ngIf="!loading; else content">
+        <mat-card *ngFor="let role of roleList" [@pulseAnimation]="cardState[role.id]" (mouseenter)="startAnimation(role.id)" (mouseleave)="stopAnimation(role.id)">
+            <mat-card-title>{{role.roleName}}</mat-card-title>
+            <mat-card-content>
+                <mat-divider inset></mat-divider>
+                <p>{{ role.roleDescription }}</p>
+            </mat-card-content>
+            <mat-divider inset></mat-divider>
+            <mat-card-footer *ngIf="onHover[role.id]">
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            </mat-card-footer>     
+        </mat-card>
+    </div>
+
+    <ng-template #content>
+        <div class="lottie" fxFlex fxLayoutAlign="center center">
+            <app-lottie-animation-view  [iconWidth]="'30vw'" [iconHeight]="'10vh'" [animationPath]="'loading-grey.json'" [loop]="true"></app-lottie-animation-view>
+        </div>
+    </ng-template>
+</div>
+
+
+

@@ -1,0 +1,10 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+      <mat-icon >{{icon}}</mat-icon> 
+      <h3>{{title}}</h3>
+    </div>
+
+    <app-user-form *ngIf="user" [user]="user" [isProfile]="title=='Profile'"></app-user-form>
+    <app-user-form *ngIf="!user" [isProfile]="title=='Profile'"></app-user-form>
+
+</div>

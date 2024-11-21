@@ -1,0 +1,13 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" class="title">
+        <mat-icon>domain</mat-icon>
+        <h3>Resources > {{resource? "Modify  resource ID "+resource.id : "New Resource"}} </h3>
+      </div>
+
+      <div>
+        <app-resource-form *ngIf="resource" [resource]="resource"></app-resource-form>
+        <app-resource-form *ngIf="!resource" ></app-resource-form>
+
+      </div>
+
+</div>

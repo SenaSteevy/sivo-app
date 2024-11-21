@@ -1,0 +1,68 @@
+<div class="background-container">
+    <div class="image-wrapper">
+      <img src="../../../assets/images/loginPage-portrait-1.jpg" alt="Image 1">
+    </div>
+    <div class="image-wrapper">
+      <img src="../../../assets/images/loginPage-portrait-2.jpg" alt="Image 2">
+    </div>
+  </div>
+<div fxFlex fxLayout fxLayoutAlign="start" fx class="body">
+   
+    <div class="login-div center-content" fxFlexFill fxFlex fxLayout="column" fxLayoutAlign="start center" >
+      <img src="../../../assets/images/logo.png" alt="logo sivo" style="height: 60px; width: 120px; margin: 20px 0px;">
+      
+      <mat-card class="login-tab" >
+        <mat-card-content >
+            <mat-tab-group>
+                <mat-tab label="Log In">
+                        <form [formGroup]="loginForm" (ngSubmit)="login()" fxFlex fxLayout="column" fxLayoutAlign=" center ">
+                            <div class="profile"></div>
+                            <span> Sign in </span>
+                            <mat-form-field appearance="outline" >
+                                <input matInput placeholder="Username" formControlName="username">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" >
+                                <input matInput type="password" placeholder="Password" formControlName="password">
+                            </mat-form-field>
+                            <span *ngIf="!!error" color="warn" style="margin-bottom: 5px;"> Incorrect Username or Password.</span>
+                            <button class="button" mat-raised-button  [disabled]="loginForm.invalid" type="submit" color="primary">Log In</button>
+                        </form>
+                    </mat-tab>
+                <mat-tab label="Register">
+                    <form [formGroup]="registerForm" (ngSubmit)="register()" fxFlex fxLayout="column wrap" fxLayoutAlign="start center ">
+                        <div class="profile"></div>
+                            <span>Register if you are new here. </span>
+                            
+                            <mat-form-field appearance="outline" >
+                                <input matInput placeholder="First Name" formControlName="firstName">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" >
+                                <input matInput placeholder="Last Name" formControlName="lastName">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" >
+                                <input matInput type="email" placeholder="Email" formControlName="email">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" >
+                                <mat-select matInput required placeholder="Gender" formControlName="gender">
+                                    <mat-option value="Male">Male</mat-option>
+                                    <mat-option value="Female">Female</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                        <mat-form-field appearance="outline" >
+                            <input matInput type="text" placeholder="Current post at Sivo" formControlName="post">
+                        </mat-form-field>
+
+                        <button class="button" mat-raised-button  [disabled]="registerForm.invalid" type="submit" color="primary">Register</button>
+                    </form>
+                </mat-tab>
+            </mat-tab-group>
+            
+        </mat-card-content>
+    </mat-card>
+    </div>
+  </div>
+  

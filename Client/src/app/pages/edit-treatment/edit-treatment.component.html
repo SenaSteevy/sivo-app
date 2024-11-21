@@ -1,0 +1,13 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" class="title">
+        <mat-icon>widgets</mat-icon>
+        <h3>Treatments > {{treatment? "Modify  Treatment ID "+treatment.id : "New Treatment"}} </h3>
+      </div>
+
+      <div class="content">
+        <app-treatment-form *ngIf="treatment" [treatment]="treatment"></app-treatment-form>
+        <app-treatment-form *ngIf="!treatment" ></app-treatment-form>
+
+      </div>
+
+</div>

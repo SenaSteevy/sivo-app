@@ -1,0 +1,64 @@
+<div class="user-form-container" fxFlex fxLayout.lt-md="column" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+    <div fxFlex="70%" fxFlex fxLayout="column" fxLayoutGap="5px"  >
+      <form [formGroup]="phaseForm"  (ngSubmit)="savePhase()"  fxFlex fxLayout="row wrap" fxLayoutAlign="center center" fxLayout.lt-sm="column" fxLayoutGap="5px">
+        
+      
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Name</mat-label>
+          <input matInput type="text" name="name" placeholder="Name" formControlName = "name" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Capacity</mat-label>
+          <input matInput type="number" name="Capacity" placeholder="Capacity" formControlName = "capacity">
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" >
+          <mat-label>Duration</mat-label>
+          <input matInput type="time" name="duration" placeholder="duration" formControlName = "duration">
+        </mat-form-field>
+
+        <mat-stepper  [orientation]="screenSize <= 1200? 'vertical' : 'horizontal'" >
+            <mat-step *ngFor="let timeslot of timeslots" [label]="timeslot.dayOfWeek">
+              <div fxFlex fxLayoutAlign="space-evenly center">
+                <mat-checkbox [formControlName]="'enabled_' + timeslot.dayOfWeek" (ngModelChange)="onCheckboxChange($event, timeslot.dayOfWeek)">Schedule</mat-checkbox>
+          
+                <mat-form-field>
+                  <mat-label>Start Time</mat-label>
+                  <input matInput type="time" [formControlName]="'startTime_' + timeslot.dayOfWeek"  />
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>End Time</mat-label>
+                  <input matInput type="time" [formControlName]="'endTime_' + timeslot.dayOfWeek"  />
+                </mat-form-field>
+              </div>
+            </mat-step>
+          </mat-stepper>
+          
+
+      </form>
+      <mat-error *ngIf="phaseForm.get('name')?.invalid && phaseForm.get('name')?.touched">
+        A Name is required.
+      </mat-error>
+      <mat-error *ngIf="phaseForm.get('tel')?.invalid && phaseForm.get('tel')?.touched">
+       Invalid phone number.
+      </mat-error>
+  
+      
+
+      <div class="actions" fxFlex fxLayoutAlign="center center" >
+        <button class="button" *ngIf="!isPhasesPage" mat-raised-button  [disabled]="phaseForm.invalid" type="submit" (click)="savePhase()" color="primary">{{!phase? "Save New Phase":"Save changes"}}</button>
+        <button class="button" *ngIf="!!phase && !isPhasesPage" mat-raised-button   type="reset" (click)="initializeForm()" color="accent">Reset changes</button>
+        <button class="button" *ngIf="isPhasesPage" mat-raised-button color="primary" [routerLink]=" phase.id+'/edit'">
+          <mat-icon> edit</mat-icon>
+          Edit Phase
+        </button>
+        <button class="button" *ngIf="isPhasesPage" mat-raised-button color="warn" (click)="deletePhase()">
+          <mat-icon>delete</mat-icon>
+          Delete Phase
+        </button>
+      </div>
+    </div>
+</div>

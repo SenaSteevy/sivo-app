@@ -1,0 +1,114 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+      <mat-icon>contacts</mat-icon>
+      <h3>Register Requests</h3>
+    </div>
+  
+   
+    <div class="userRequests-container" fxFlex fxLayout="column" fxLayoutGap="10px">
+        <h4> All Register Requests</h4>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" >
+            <mat-form-field appearance="fill" style="width:30%">
+                <mat-label>Filter</mat-label>
+                <input  matInput type="text" width="inherit"  placeholder="Ex : userRequest name " (keyup)="applyFilter($event)" #input>
+            </mat-form-field>
+           
+            <button  class="button" mat-raised-button color="accent" [disabled]="selection.isEmpty()" [matMenuTriggerFor]="applyMenu">
+                Selected requests
+                <mat-icon>arrow_right</mat-icon>
+            </button>
+        
+            <!-- Apply Menu -->
+            <mat-menu #applyMenu="matMenu">
+            <button mat-menu-item (click)="applyAction('Delete')"><mat-icon>delete</mat-icon> Delete</button>
+            </mat-menu>
+    
+            <!-- Select All Button -->
+            <button  class="button" mat-raised-button color="primary" (click)="selectAllRows()">{{ selectAllChecked ? 'Deselect All' : 'Select All' }}</button>
+        </div>
+        <ng-container *ngIf="paginatedData.data.length >= 0 && state==='ready'; else loading " >    
+           
+            <table mat-table [dataSource]="paginatedData">
+              
+                <ng-container matColumnDef="id" >
+                    <th mat-header-cell *matHeaderCellDef >ID</th>
+                    <td mat-cell *matCellDef="let userRequest">{{ userRequest.id }} </td>
+                </ng-container>
+                    
+                <ng-container matColumnDef="name" >
+                    <th mat-header-cell *matHeaderCellDef >NAME</th>
+                    <td mat-cell *matCellDef="let userRequest" >{{ userRequest.gender=="MALE"? "Mr. ":"Ms. "+ userRequest.firstName+ " "+userRequest.lastName }} </td>
+                </ng-container>
+                        
+                <ng-container matColumnDef="email" >
+                    <th mat-header-cell *matHeaderCellDef >EMAIL</th>
+                    <td mat-cell *matCellDef="let userRequest" >{{ userRequest.email}} </td>
+                </ng-container>
+               
+                <ng-container matColumnDef="post" >
+                    <th mat-header-cell *matHeaderCellDef >POST</th>
+                    <td mat-cell *matCellDef="let userRequest" >{{ userRequest.post }} </td>
+                </ng-container>
+                            
+                <ng-container matColumnDef="status" >
+                    <th mat-header-cell *matHeaderCellDef >STATUS </th>
+                    <td mat-cell *matCellDef="let userRequest" >{{ userRequest.status }} </td>
+                </ng-container>
+                
+                <ng-container matColumnDef="actions" >
+                    <th mat-header-cell *matHeaderCellDef > </th>
+                    <td mat-cell *matCellDef="let userRequest" >
+                            <button mat-mini-fab color="primary" style="margin : 0px 10px" (click)="acceptUser(userRequest)"><mat-icon>add</mat-icon> </button>
+                            <button mat-mini-fab color="warn" (click)="deleteUserRequest(userRequest)"><mat-icon>delete</mat-icon> </button>
+                    </td>
+                </ng-container>
+                
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let task">
+                      <mat-checkbox style="align-self: flex-end;"
+                      (click)="$event.stopPropagation()"
+                      (change)="selectRow($event.checked, task)"
+                      [checked]="selection.isSelected(task)"
+                      ></mat-checkbox>
+                    </td>
+                  </ng-container>
+                    
+                <tr mat-header-row *matHeaderRowDef="displayedColumns" class="header" class="animate-row"></tr>
+
+                <tr mat-row *matRowDef="let element; columns: displayedColumns; let i = index"
+                    class="hover-row animate-row "
+                    [style.animation-delay.ms]="(i+1) * 300">
+                </tr>
+                
+                
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="6" style="text-align: center;">
+                        {{ input.value ? 'No data matching this filter: ' + input.value : 'No data found.' }}
+                    </td>   
+                </tr>
+                             
+                
+            </table>
+                                
+            <mat-paginator 
+            [length]="userRequestsDataSource.data.length"
+            [pageSize]="10"
+            [pageSizeOptions]="[5,10, 20, 30]"
+            (page)="handlePageEvent($event)"
+            showFirstLastButtons>
+            </mat-paginator>
+        </ng-container>
+        
+        <ng-template #loading>
+            <div *ngIf="state==='error'" class="error">
+                <span>Oups! An unexpected error occured. Please contact an Administrator if it persist.</span>
+            </div>
+            <div class="lottie" fxFlex fxLayoutAlign="center center" *ngIf="state==='loading'">
+                <app-lottie-animation-view  [iconWidth]="'30vw'" [iconHeight]="'10vh'" [animationPath]="'loading-grey.json'" [loop]="true"></app-lottie-animation-view>
+            </div>
+        </ng-template>
+                        
+    </div>
+        
+</div>

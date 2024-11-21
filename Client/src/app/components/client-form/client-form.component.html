@@ -1,0 +1,53 @@
+<div class="user-form-container" fxFlex fxLayout.lt-md="column" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+      <div fxFlex="70%" fxFlex fxLayout="column" fxLayoutGap="5px" >
+        <form [formGroup]="clientForm"  (ngSubmit)="saveClient()"  fxFlex fxLayout="row wrap" fxLayoutAlign.lt-md="center center" fxLayout.lt-sm="column" fxLayoutGap="5px">
+          
+        
+  
+          <mat-form-field appearance="outline" >
+            <mat-label>Name</mat-label>
+            <input matInput type="text" name="name" placeholder="Name" formControlName = "name" >
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" >
+            <mat-label>Email</mat-label>
+            <input matInput type="email" name="email" placeholder="Email" formControlName = "email">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" >
+            <mat-label>Address</mat-label>
+            <input matInput type="text" name="address" placeholder="Address" formControlName = "address">
+          </mat-form-field>
+  
+  
+          <mat-form-field appearance="outline" >
+            <mat-label>Phone Number</mat-label>
+            <input matInput type="tel" name="tel" placeholder="tel" formControlName = "tel">
+          </mat-form-field>
+  
+        </form>
+        <mat-error *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched">
+          A Name is required.
+        </mat-error>
+        <mat-error *ngIf="clientForm.get('tel')?.invalid && clientForm.get('tel')?.touched">
+         Invalid phone number.
+        </mat-error>
+    
+        
+  
+        <div class="actions" fxFlex fxLayoutAlign="center center" >
+          <button class="button" *ngIf="!isClientsPage" mat-raised-button  [disabled]="clientForm.invalid" type="submit" (click)="saveClient()" color="primary">{{!client? "Save New Client":"Save changes"}}</button>
+          <button class="button" *ngIf="!!client && !isClientsPage" mat-raised-button   type="reset" (click)="initializeForm()" color="accent">Reset changes</button>
+          <button class="button" *ngIf="isClientsPage" mat-raised-button color="primary" [routerLink]=" client.id+'/edit'">
+            <mat-icon> edit</mat-icon>
+            Edit Client
+          </button>
+          <button class="button" *ngIf="isClientsPage" mat-raised-button color="warn" (click)="deleteClient()">
+            <mat-icon>delete</mat-icon>
+            Delete Client
+          </button>
+        </div>
+      </div>
+  </div>
+  

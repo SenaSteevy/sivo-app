@@ -1,0 +1,11 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" class="title">
+        <mat-icon>receipt</mat-icon>
+        <h3>Orders > {{job? "Modify Order N° "+job.numOrder : "New Order"}} </h3>
+      </div>
+
+      <div class="content">
+        <app-order-form [job]="job"></app-order-form>
+      </div>
+
+</div>

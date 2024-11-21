@@ -1,0 +1,13 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px" class="title">
+        <mat-icon>contacts</mat-icon>
+        <h3>Clients > {{client? "Modify  Client ID "+client.id : "New Client"}} </h3>
+      </div>
+
+      <div>
+        <app-client-form *ngIf="client" [client]="client"></app-client-form>
+        <app-client-form *ngIf="!client" ></app-client-form>
+
+      </div>
+
+</div>

@@ -1,0 +1,45 @@
+.container{
+    padding: 2em 3em;
+    z-index: 1;
+}
+
+.card{
+    background-color: white;
+    width: 60%;
+    border-radius: 15px;
+    padding: 1em 2em;
+}
+
+.button{
+    margin : 0.5rem 1rem;
+    border-radius: 20px;
+  }
+
+.image-preview{
+    cursor:pointer;
+
+}
+
+.image-container{
+    background-color:rgba(0, 0, 0, 0.705); 
+    z-index:3; 
+    position:absolute;
+    width:100vw;
+    height:100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.excel-image{
+    position :absolute;
+    justify-self: center;
+    align-self: center;
+    
+    background-color: white;
+    border-radius: 15px;
+    padding: 1em;
+    width:60%;
+    height: fit-content;
+}
+

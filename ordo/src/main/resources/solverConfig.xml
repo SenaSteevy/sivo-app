@@ -1,0 +1,37 @@
+<solver>
+    <memLimit>2g</memLimit>
+
+	<environmentMode>FAST_ASSERT</environmentMode>
+
+
+	<solutionClass>com.sivo.domain.Schedule</solutionClass>
+
+	<entityClass>com.sivo.domain.Task</entityClass>
+
+	<scoreDirectorFactory>
+		<constraintProviderClass>com.sivo.score.Constraints
+		</constraintProviderClass>
+	</scoreDirectorFactory>
+
+    <constructionHeuristic>
+        <constructionHeuristicType>SIMPLE_RANDOM</constructionHeuristicType>
+    </constructionHeuristic>
+    <localSearch>
+        <localSearchType>TABU_SEARCH</localSearchType>
+        <termination>
+            <secondsSpentLimit>60</secondsSpentLimit>
+        </termination>
+    </localSearch>
+    <acceptor>
+        <entityTabuSize>1000</entityTabuSize>
+        <valueTabuSize>1000</valueTabuSize>
+    </acceptor>
+    <selector>
+        <entitySorterManner>NONE</entitySorterManner>
+        <cacheType>PHASE</cacheType>
+        <moveListFactory>
+            <moveListFactoryClass>org.optaplanner.core.move.factory.DefaultMoveListFactory</moveListFactoryClass>
+            <cacheType>PHASE</cacheType>
+        </moveListFactory>
+    </selector>
+</solver>
