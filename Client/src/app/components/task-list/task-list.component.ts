@@ -18,7 +18,7 @@ export class TaskListComponent implements  AfterViewInit {
   @Input() jobList: Job[] = [];
   @Input() phase: any
   loading: boolean = true;
-  displayedColumns: string[] = ['id', 'client', 'description', 'startTime', 'duration', 'status', 'buttons', 'actions'];
+  displayedColumns: string[] = ['id', 'description', 'startTime', 'duration', 'status', 'buttons', 'actions'];
 
   @ViewChild("paginator", { static: false }) paginator!: MatPaginator;
   @Output() onChanges  : EventEmitter<any> = new EventEmitter()
@@ -102,13 +102,11 @@ export class TaskListComponent implements  AfterViewInit {
     // Custom filtering function
     this.taskListDataSource.filterPredicate = (task: Task, filter: string) => {
       const numOrder = task.numOrder?.toString()
-      const clientName = task.client?.name.toLowerCase();
       const status = task.status.toLowerCase();
       const startTime = moment(task.startTime).format('MMMM Do YYYY, h:mm:ss a')?.toLowerCase();      
       const description = task.treatment.description?.toLowerCase();
       return (
         numOrder?.includes(filter) ||
-        clientName.includes(filter) ||
         status.includes(filter) ||
         startTime?.includes(filter) ||
         description?.includes(filter)
@@ -139,7 +137,7 @@ export class TaskListComponent implements  AfterViewInit {
           this.taskListDataSource = new MatTableDataSource<Task>();
          this.jobList.forEach((job) => {
             const tasksForPhase = job.taskList.filter((task) => task.treatment.phase.name === this.phase.name)
-            .map((task) => task = {...task, numOrder : job.numOrder, client : job.client } );
+            .map((task) => task = {...task, numOrder : job.numOrder} );
             this.taskListDataSource.data.push(...tasksForPhase);
           });
           

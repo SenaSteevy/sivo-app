@@ -4,56 +4,34 @@
         <mat-step [stepControl]="generalForm">
           <form [formGroup]="generalForm">
             <ng-template matStepLabel>General Informations</ng-template>
-              
-            <ng-container *ngIf="isUpdate">
-                <mat-form-field appearance="outline">
-                  <mat-label>N° Order</mat-label>
-                  <input   type="number"  matInput placeholder="N° Order" formControlName="numOrder" required [readonly]="isOrdersPage" >
-                </mat-form-field>
-              </ng-container>
             
+            <ng-container *ngIf="isUpdate">
               <mat-form-field appearance="outline">
-                  <mat-label>Code Order</mat-label>
-                  <input  type="text" matInput placeholder="Order Code"  formControlName="codeOrder" required [readonly]="isOrdersPage"  >
+                <mat-label>N° Order</mat-label>
+                <input   type="number"  matInput placeholder="N° Order" formControlName="numOrder" required [readonly]="isOrdersPage" >
               </mat-form-field>
-              
+            </ng-container>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Code Order</mat-label>
+              <input  type="text" matInput placeholder="Order Code"  formControlName="codeOrder" required [readonly]="isOrdersPage"  >
+            </mat-form-field>
+ 
               <mat-form-field appearance="outline">
-                  <mat-label>Client</mat-label>
-                  <input type="text" *ngIf="isOrdersPage" matInput   [value]="generalForm.get('client')?.value?.name" [readonly]="isOrdersPage">
-                  <mat-select formControlName="client" *ngIf="!isOrdersPage" >
-                    <mat-option (click)="newClient()"><mat-icon>add</mat-icon>New Client</mat-option>
-                    <mat-option *ngFor="let client of clientList" [value]="client" >{{client.name}}</mat-option>
-                  </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Resource</mat-label>
+                <mat-label>Order type</mat-label>
                 <input type="text" *ngIf="isOrdersPage" matInput   
-                [value]="generalForm.get('resource')?.value?.name +' '+generalForm.get('resource')?.value?.type" 
-                [readonly]="isOrdersPage">
-
-                <mat-select formControlName="resource" *ngIf="!isOrdersPage"  >
-                    <mat-option (click)="newResource()"><mat-icon>add</mat-icon>New Resource</mat-option>
-                    <mat-option *ngFor="let resource of resourceList" 
-                    [value]="resource" 
-                    [matTooltip]="'quantity in stock : '+resource.quantity "
-                    matTooltipPosition="after">{{resource.name+" "+resource.type}}</mat-option>
+                [value]="'O'+generalForm.get('type')?.value" [readonly]="isOrdersPage">
+                <mat-select formControlName="type" *ngIf="!isOrdersPage" >
+                  <mat-option value="F"> OF</mat-option>
+                  <mat-option value="T"> OT</mat-option>
                 </mat-select>
               </mat-form-field>
-            
-              <mat-form-field appearance="outline">
-                  <mat-label>Order type</mat-label>
-                  <input type="text" *ngIf="isOrdersPage" matInput   
-                  [value]="'O'+generalForm.get('type')?.value" [readonly]="isOrdersPage">
-                  <mat-select formControlName="type" *ngIf="!isOrdersPage" >
-                      <mat-option value="F"> OF</mat-option>
-                      <mat-option value="T"> OT</mat-option>
-                  </mat-select>
-              </mat-form-field>
               <div>
-               <button class="button" mat-button matStepperNext>Next</button>
+                <button class="button" mat-button matStepperNext>Next</button>
               </div>
-          </form>
+              
+            </form>
+
         </mat-step>
         
         <mat-step [stepControl]="phaseForm" *ngIf="phaseList.length > 0">

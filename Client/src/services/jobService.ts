@@ -3,39 +3,28 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, takeLast } from 'rxjs';
 import { Job } from '../models/Job';
 import { Planning } from 'src/models/Planning';
-import { AuthService } from './authService';
 import { Phase } from 'src/models/Phase';
-import { Task } from 'src/models/Task';
-import { Client } from 'src/models/Client';
-import { Resource } from 'src/models/Resource';
 import { Treatment } from 'src/models/Treatment';
-import { UserRequest } from 'src/models/UserRequest';
 import { AutoPlanning } from 'src/models/AutoPlanning';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class JobService {
 
   phaseList : Phase[] = []
-  clientlist : Client[] = []
   treatmentList : Treatment[] = []
-  resourceList : Resource[] = []
 
   async updateJobService(): Promise<void> {
     try {
-      const clientsResponse = await this.getAllClients().toPromise();
-      this.clientlist = clientsResponse || [];
-  
+      
       const phasesResponse = await this.getAllPhases().toPromise();
       this.phaseList = phasesResponse || [];
   
       const treatmentsResponse = await this.getTreatments().toPromise();
       this.treatmentList = treatmentsResponse || [];
-  
-      const resourcesResponse = await this.getAllResources().toPromise();
-      this.resourceList = resourcesResponse || [];
 
     } catch (error) {
       console.error('Error while fetching data:', error);
@@ -47,7 +36,7 @@ export class JobService {
   private apiUrl = environment.apiUrl+'ordo-service';
 
 
-  constructor(private http: HttpClient,private authService : AuthService ) {
+  constructor(private http: HttpClient) {
      this.updateJobService()
   }
 
@@ -116,13 +105,8 @@ export class JobService {
     return this.http.post<Job[]>(`${this.apiUrl}/scheduler/updateJobList`,jobList )
   }
 
-  getAllClients() {
-    return this.http.get<Client[]>(`${this.apiUrl}/clients/getAll` )
-  }
 
-  getAllResources() {
-    return this.http.get<Resource[]>(`${this.apiUrl}/resources/getAll` )
-    }
+
 
     newJob(job : Job){
       return this.http.post(`${this.apiUrl}/jobs/new`,job )  
@@ -137,46 +121,6 @@ export class JobService {
     }
     updateJob(numOrder : number, job : any){
       return this.http.post(`${this.apiUrl}/jobs/updateById/${numOrder}`, job ) 
-    }
-
-    getClients(){
-      return this.http.get<Client[]>(`${this.apiUrl}/clients/getAll` ) 
-    }
-
-    getClientById(id : string){
-      return this.http.get<Client>(`${this.apiUrl}/clients/findById/${id}` ) 
-    }
-
-    updateClient(id : number, data : any){
-      return this.http.post<Client>(`${this.apiUrl}/clients/updateById/${id}`,data ) 
-    }
-
-    createClient(data : any){
-      return this.http.post<Client>(`${this.apiUrl}/clients/new`,data ) 
-    }
-
-    deleteClient(id : number){
-      return this.http.post(`${this.apiUrl}/clients/delete/${id}`, null ) 
-    }
-
-    getResources(){
-      return this.http.get<Resource[]>(`${this.apiUrl}/resources/getAll` ) 
-    }
-
-    getResourceById(id : string){
-      return this.http.get<Resource>(`${this.apiUrl}/resources/findById/${id}` ) 
-    }
-
-    updateResource(id : number, data : any){
-      return this.http.post<Resource>(`${this.apiUrl}/resources/updateById/${id}`,data ) 
-    }
-
-    createResource(data : any){
-      return this.http.post<Resource>(`${this.apiUrl}/resources/save`,data ) 
-    }
-
-    deleteResource(id : number){
-      return this.http.post(`${this.apiUrl}/resources/delete/${id}`, null ) 
     }
 
     getPhaseById(id:any){

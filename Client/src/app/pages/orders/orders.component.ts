@@ -2,7 +2,6 @@ import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } fr
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { Client } from 'src/models/Client';
 import { Job } from 'src/models/Job';
 import { JobService } from 'src/services/jobService';
 import * as moment from 'moment';
@@ -27,7 +26,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 
 })
 export class OrdersComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['select','numOrder', 'client', 'createdAt', 'dueDate', 'status'];
+  displayedColumns: string[] = ['select','numOrder', 'createdAt', 'dueDate', 'status'];
   displayedColumnsWithExpand : string[] = [...this.displayedColumns, 'expand']
   ordersDataSource: MatTableDataSource<Job> = new MatTableDataSource<Job>();
   paginatedData: MatTableDataSource<Job> = new MatTableDataSource<Job>();
@@ -215,13 +214,11 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     // Custom filtering function
     this.ordersDataSource.filterPredicate = (job: Job, filter: string) => {
       const numOrder = job.numOrder.toString()
-      const clientName = job.client?.name.toLowerCase();
       const status = job.status.toLowerCase();
       const createdAt = moment(job.createdAt).format('MMMM Do YYYY, h:mm:ss a')?.toLowerCase();      
       const dueDate = moment(job.dueDate).format('MMMM Do YYYY, h:mm:ss a')?.toLowerCase(); 
       return (
         numOrder.includes(filter) ||
-        clientName.includes(filter) ||
         status.includes(filter) ||
         createdAt?.includes(filter) ||
         dueDate?.includes(filter)
@@ -241,9 +238,7 @@ export class OrdersComponent implements OnInit, AfterViewInit {
   }
 
 
-  selectClient(client: Client) {
-    this.router.navigate(['/clients/edit', client.id]);
-  }
+
 
   getDueDateRate() {
     const count = this.ordersDataSource.data.filter((job) => job.doneAt? 

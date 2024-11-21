@@ -2,9 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@ang
 import { Job } from 'src/models/Job';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { JobService } from 'src/services/jobService';
-import { Client } from 'src/models/Client';
 import { Phase } from 'src/models/Phase';
-import { Resource } from 'src/models/Resource';
 import { Treatment } from 'src/models/Treatment';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
@@ -22,10 +20,8 @@ export class OrderFormComponent implements OnInit {
 @Input('job') job ! : Job
 isUpdate! : boolean
 generalForm !: FormGroup
-clientList : Client[] =[]
 phaseList: Phase[]  =[]
 treatmentList : Treatment[] =[]
-resourceList : Resource[] =[]
 detailsForm ! : FormGroup
 phaseForm! : FormGroup
 isOrdersPage : boolean = false;
@@ -57,9 +53,7 @@ nullTreatment : Treatment = {
       
       this.jobService.updateJobService().finally( () => {
       this.phaseList = this.jobService.phaseList;
-      this.clientList = this.jobService.clientlist;
       this.treatmentList = this.jobService.treatmentList;
-      this.resourceList = this.jobService.resourceList;
       
       this.changeDetectorRef.detectChanges()
       
@@ -87,8 +81,6 @@ nullTreatment : Treatment = {
       this.generalForm = this.formBuilder.group({
         numOrder: [this.job?.numOrder || null, Validators.required],
         codeOrder: [this.job?.codeOrder || '', Validators.required],
-        client: [ this.clientList.find((client) => client.id == this.job?.client.id) , Validators.required],
-        resource: [this.resourceList.find((resource) => resource.id ==this.job?.resource.id), Validators.required],
         type: [this.job?.type , Validators.required]
       });
       this.generalForm.get('numOrder')?.disable();
@@ -126,13 +118,11 @@ nullTreatment : Treatment = {
         let order : any = {
           numOrder: this.generalForm.get('numOrder')?.value,
           codeOrder: this.generalForm.get('codeOrder')?.value,
-          client: this.generalForm.get('client')?.value,
           description: this.phaseForm.get('surfaçage')?.value.description,
           supplement : " new supplement ",
           type: this.generalForm.get('type')?.value,
           dueDate: moment(this.detailsForm.get('dueDate')?.value).format("YYYY-MM-DDTHH:mm:ss") ,
           taskList: this.createTaskList(),
-          resource: this.generalForm.get('resource')?.value,
           startDateTime: null,
           leadTime: null,
           priority: this.detailsForm.get('priority')?.value,
@@ -140,8 +130,6 @@ nullTreatment : Treatment = {
           doneAt: null,
           createdAt:  moment().format("YYYY-MM-DDTHH:mm:ss")
         }
-
-        console.log("dueDate", this.detailsForm.get('dueDate')?.value)
 
         if(!this.isUpdate){ 
           

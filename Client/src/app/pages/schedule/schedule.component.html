@@ -17,15 +17,6 @@
       </mat-form-field>
     
 
-    <div>
-      <mat-slide-toggle  [checked]="isToggleOn" (change)="HandleToggleChange($event)" color="primary">Auto planning</mat-slide-toggle>
-      <button mat-button 
-      matTooltip="Configure auto planification"
-      matTooltipHideDelay="300" routerLink="/settings">
-        <mat-icon color="primary">settings</mat-icon>
-      </button>
-    </div>
-
     <button class="button" mat-raised-button color="primary" matTooltip="Generate a new planning." [disabled]="generating" (click)="generateNewPlanning()">
       <mat-icon>add</mat-icon> New
     </button>

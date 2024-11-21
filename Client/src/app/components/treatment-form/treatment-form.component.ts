@@ -4,11 +4,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Treatment } from 'src/models/Treatment';
-import { AuthService } from 'src/services/authService';
 import { JobService } from 'src/services/jobService';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { Phase } from 'src/models/Phase';
-import { Dialog } from '@angular/cdk/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
 
 @Component({
@@ -28,8 +26,7 @@ export class TreatmentFormComponent implements OnInit {
       private router : Router,
       private activatedRoute : ActivatedRoute,
       private dialog : MatDialog,
-      private _snackBar: MatSnackBar,
-      private authService : AuthService ) {
+      private _snackBar: MatSnackBar) {
         this.isTreatmentsPage = this.activatedRoute.snapshot.url.join("/").endsWith("treatments")
        }
   

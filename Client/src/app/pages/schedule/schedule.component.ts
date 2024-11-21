@@ -38,7 +38,6 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
     expandedIndex: number = -1;
     plannings: Planning[] = [];
     filteredPlannings: Planning[] = [];
-    isToggleOn : any;
 
     private charts: Chart[] = [];
     lottieAnimations: boolean[] = [];
@@ -64,7 +63,6 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
       ngOnInit() {
       this.loading = true
       Chart.register(...registerables);
-      this.getAutoPlanning();
       this.getAllphases(); 
       this.loadPlannings();
       
@@ -105,27 +103,9 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
         } 
   });
 }
-  getAutoPlanning(){
-    this.jobService.getAutoPlanning().subscribe({
-      next : (response : any)  => { 
-        this.isToggleOn = response.value == "ON"? true : false;
-      },
-      error : (error)  => { console.log("error getting AutoPlanningValue : ",error)}
-    })
-  }
+
   
-  HandleToggleChange(event : any){
-    const toggleEvent = event as unknown as MatSlideToggleChange;
-    this.isToggleOn = toggleEvent.checked;
-    console.log("toggle : ",this.isToggleOn)
-  
-    this.jobService.setAutoPlanning(this.isToggleOn? "ON":"OFF").subscribe({
-      next : (response : any)  => { 
-        this._snackBar.open(`Auto Planification is now ${this.isToggleOn?"ON.":"OFF."}`,'X',{ duration : 3000})
-      },
-      error : (error)  => { console.log("error setting AutoPlanningValue : ",error)}
-    })
-  }
+
   
   openSnackBar(message : string) {
     this._snackBar.open( message , '', {
