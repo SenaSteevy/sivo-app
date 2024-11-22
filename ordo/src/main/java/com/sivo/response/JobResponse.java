@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.sivo.domain.Task;
-import com.sivo.resource.Client;
-import com.sivo.resource.Resource;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -28,7 +26,6 @@ public class JobResponse {
 	
 	private String codeOrder ;
 
-	private Client client;
 	
 	private String description;
 	
@@ -40,8 +37,6 @@ public class JobResponse {
 	
 	private List<Task> taskList;
 	
-	private Resource resource;
-
 	private LocalDateTime startDateTime;
 
 	private Duration leadTime;

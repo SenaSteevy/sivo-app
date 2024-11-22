@@ -11,14 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.sivo.request.JobRequest;
-import com.sivo.resource.Client;
-import com.sivo.resource.Resource;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -48,11 +44,6 @@ public class Job {
 	@Column(name = "code_order")
 	private String codeOrder;
 	
-	@ManyToOne
-	@ToString.Exclude
-	@JoinColumn( name = "client_id")
-	private Client client;
-	
 	@Column(name = "description")
 	private String description;
 	
@@ -68,10 +59,6 @@ public class Job {
 	@ToString.Exclude
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "job", orphanRemoval = true)
 	private List<Task> taskList;
-	
-	@ManyToOne(cascade = CascadeType.DETACH)
-	@JoinColumn(name = "resource_id")
-	private Resource resource;
 
 	@Column(name = "startDateTime")
 	private LocalDateTime startDateTime;
@@ -96,13 +83,11 @@ public class Job {
 
 		this.numOrder = jobRequest.getNumOrder();
 		this.codeOrder = jobRequest.getCodeOrder();
-		this.client = jobRequest.getClient();
 		this.description = jobRequest.getDescription();
 		this.supplement = jobRequest.getSupplement();
 		this.type = jobRequest.getType();
 		this.dueDate = jobRequest.getDueDate();
 		this.taskList = new ArrayList<Task>();
-		this.resource = jobRequest.getResource();
 		this.startDateTime = jobRequest.getStartDateTime();
 		this.leadTime = jobRequest.getLeadTime();
 		this.priority = jobRequest.getPriority();

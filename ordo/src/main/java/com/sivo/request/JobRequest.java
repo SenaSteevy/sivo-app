@@ -6,8 +6,6 @@ import java.util.List;
 
 import com.sivo.domain.Job;
 import com.sivo.domain.Task;
-import com.sivo.resource.Client;
-import com.sivo.resource.Resource;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,7 +29,6 @@ public class JobRequest {
 		
 	private String codeOrder ;
 	
-	private Client client;
 	
 	private String description;
 	
@@ -43,8 +40,6 @@ public class JobRequest {
 	
 	private List<Task> taskList;
 	
-	private Resource resource;
-
 	private LocalDateTime startDateTime;
 
 	private Duration leadTime;
@@ -60,13 +55,11 @@ public class JobRequest {
 	public JobRequest(Job job) {
 		this.numOrder = job.getNumOrder();
 		this.codeOrder = job.getCodeOrder();
-		this.client = job.getClient();
 		this.description = job.getDescription();
 		this.doneAt = job.getDoneAt();
 		this.dueDate = job.getDueDate();
 		this.leadTime = job.getLeadTime();
 		this.priority = job.getPriority();
-		this.resource = job.getResource();
 		this.startDateTime = job.getStartDateTime();
 		this.status = job.getStatus();
 		this.supplement = job.getSupplement();

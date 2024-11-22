@@ -8,9 +8,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sivo</groupId>
-	<artifactId>ordo</artifactId>
+	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ordo</name>
+	<name>API</name>
 	<description>job-scheduler project for Spring Boot</description>
 	<properties>
 		<java.version>8</java.version>

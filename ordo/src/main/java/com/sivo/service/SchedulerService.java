@@ -4,10 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,20 +42,12 @@ import com.sivo.domain.Schedule;
 import com.sivo.domain.Task;
 import com.sivo.domain.Treatment;
 import com.sivo.repository.AutoPlanningRepository;
-import com.sivo.repository.ClientRepository;
 import com.sivo.repository.JobRepository;
 import com.sivo.repository.PhaseRepository;
 import com.sivo.repository.PlanningRepository;
-import com.sivo.repository.ResourceRepository;
 import com.sivo.repository.TaskRepository;
 import com.sivo.repository.TreatmentRepository;
-import com.sivo.request.AutoPlanningRequest;
-import com.sivo.request.ClientRequest;
 import com.sivo.request.JobRequest;
-import com.sivo.resource.AutoPlanning;
-import com.sivo.resource.Client;
-import com.sivo.resource.Resource;
-import com.sivo.resource.Timeslot;
 
 @Service
 @Transactional
@@ -81,11 +71,7 @@ public class SchedulerService {
 	@Autowired
 	PlanningRepository planningRepository;
 
-	@Autowired
-	ClientRepository clientRepository;
 
-	@Autowired
-	ResourceRepository resourceRepository;
 
 	String[] colors = { "MONOCOLORE", "BICOLORE", "BRUN", "TEINTE", "GRIS", "BLACK", "SUN", "MARRON", "BURGUNDY",
 			"SCOTOVUE", "QUARTZ", "LEMON", "ROSE", "ORANGE" };
@@ -101,20 +87,6 @@ public class SchedulerService {
 	Phase resys;
 	Phase antiReflet;
 
-	public ResponseEntity<?> setAutoPlanning(String value) {
-		AutoPlanningRequest autoPlanning = new AutoPlanningRequest(value);
-		return this.updateAutoPlanning(autoPlanning);
-	}
-
-	public ResponseEntity<?> getAutoPlanning() {
-		List<AutoPlanning> autoPlannings = autoPlanningRepository.findAll();
-
-		if (autoPlannings.isEmpty()) {
-			return ResponseEntity.ok(new AutoPlanning("OFF"));
-		} else {
-			return ResponseEntity.ok(autoPlannings.get(0));
-		}
-	}
 
 	public Schedule solve(Schedule problem) {
 
@@ -226,7 +198,6 @@ public class SchedulerService {
 
 			// Update the properties of existingJob from updatedJob
 			existingJob.setCodeOrder(updatedJob.getCodeOrder());
-			existingJob.setClient(updatedJob.getClient());
 			existingJob.setDescription(updatedJob.getDescription());
 			existingJob.setSupplement(updatedJob.getSupplement());
 			existingJob.setType(updatedJob.getType());
@@ -235,7 +206,6 @@ public class SchedulerService {
 			existingJob.setPriority(updatedJob.getPriority());
 			existingJob.setCreatedAt(updatedJob.getCreatedAt());
 			existingJob.setDoneAt(updatedJob.getDoneAt());
-			existingJob.setResource(updatedJob.getResource());
 			existingJob.setStartDateTime(updatedJob.getStartDateTime());
 			existingJob.setStatus(updatedJob.getStatus());
 
@@ -274,111 +244,14 @@ public class SchedulerService {
 		return ResponseEntity.ok().body(jobRepository.findAll());
 	}
 
-	public ResponseEntity<?> refreshDB() throws IOException {
 
-		InputStream file = getClass().getClassLoader().getResourceAsStream("data/sivo.xlsx");
-
-		XSSFWorkbook workbook = new XSSFWorkbook(file);
-		Sheet sheet = workbook.getSheet("Sheet 1");
-
-		taskRepository.deleteAll();
-		planningRepository.deleteAll();
-		jobRepository.deleteAll();
-		clientRepository.deleteAll();
-		resourceRepository.deleteAll();
-
-		resetPhases();
-
-		// resource
-		Resource resourceFini = new Resource("paire de verres", "simple", 1480);
-		resourceFini = resourceRepository.save(resourceFini);
-
-		Resource resourceSemiFini = new Resource("paire de verres", "semi-finie", 520);
-		resourceSemiFini = resourceRepository.save(resourceSemiFini);
-
-		// client
-		ClientRequest clientRequest = new ClientRequest("sena steevy", "rue 7 novembre", "anesyveets@gmail.com",
-				" +216 52000008");
-		Client client = new Client(clientRequest);
-		client = clientRepository.save(client);
-
-		createAllTreatment();
-
-		int maxRows = 2000;
-		for (int i = 1; i < maxRows; i++) {
-			Row row = sheet.getRow(i);
-			JobRequest jobRequest = new JobRequest();
-
-			// codeOrder
-			jobRequest.setCodeOrder(row.getCell(4).getStringCellValue());
-
-			// Client
-			jobRequest.setClient(client);
-
-			// description
-			jobRequest.setDescription(row.getCell(5).getStringCellValue());
-
-			// supplement
-			jobRequest.setSupplement(row.getCell(7).getStringCellValue());
-
-			// type
-			jobRequest.setType(row.getCell(3).getStringCellValue());
-
-			// Resource
-			if (jobRequest.getType().equalsIgnoreCase("F")) {
-				jobRequest.setResource(resourceFini);
-			} else {
-				jobRequest.setResource(resourceSemiFini);
-
-			}
-
-			// dueDate
-			LocalDateTime dateTime = getLocalDateTime(row.getCell(19));
-			jobRequest.setDueDate(dateTime);
-
-			// il n'y a pas de priorité définie dans le fichier excel
-			jobRequest.setPriority(1);
-
-			// Status
-			jobRequest.setStatus("UNDONE");
-
-			// doneAt
-			jobRequest.setDoneAt(null);
-
-			// createdAt
-			LocalDateTime createdAt = getLocalDateTime(row.getCell(8));
-			jobRequest.setCreatedAt(createdAt);
-
-			// taskList
-			String supplement = row.getCell(7).getStringCellValue();
-			List<Task> taskList = getTaskList(i, row, supplement);
-			for (Task task : taskList)
-				task = taskRepository.save(task);
-
-			jobRequest.setTaskList(taskList);
-			ResponseEntity<?> response = createJob(jobRequest);
-
-			System.out.println("Job " + (i + 1) + " créé.");
-		}
-
-		workbook.close();
-		file.close();
-		return ResponseEntity.ok("La base de Donnéés a été reinitialisée !");
-	}
-
-	private void resetPhases() {
-		impression = createPhase("impression", 2, Duration.ofMinutes(2));
-		surfacage = createPhase("surfaçage", 160, Duration.ofHours(2));
-		coloration = createPhase("coloration", 15, Duration.ofMinutes(30));
-		resys = createPhase("resys", 120, Duration.ofHours(2));
-		antiReflet = createPhase("anti-reflet", 165, Duration.ofHours(3));
-	}
-
-	private Phase createPhase(String name, int capacity, Duration duration) {
-		List<Timeslot> timeslotList = generateTimeSlotList();
-		Phase phase = new Phase(name, capacity, duration, timeslotList);
-		return phaseRepository.save(phase);
-	}
+//	private void resetPhases() {
+//		impression = createPhase("impression", 2, Duration.ofMinutes(2));
+//		surfacage = createPhase("surfaçage", 160, Duration.ofHours(2));
+//		coloration = createPhase("coloration", 15, Duration.ofMinutes(30));
+//		resys = createPhase("resys", 120, Duration.ofHours(2));
+//		antiReflet = createPhase("anti-reflet", 165, Duration.ofHours(3));
+//	}
 
 	private List<Job> getJobList(Schedule schedule) {
 		List<Job> planning = schedule.getTasks().stream()
@@ -430,34 +303,6 @@ public class SchedulerService {
 		}
 
 		return planning;
-	}
-
-	private void createAllTreatment() {
-
-		// impression
-		Treatment treatment = new Treatment("Impression", impression);
-		treatment = treatmentRepository.save(treatment);
-
-		// surfacage
-		treatment = new Treatment("G : 1.5mm D : 1.6mm", surfacage);
-		treatment = treatmentRepository.save(treatment);
-
-		// coloration
-		for (String color : colorations) {
-			treatment = new Treatment(color, coloration);
-			treatment = treatmentRepository.save(treatment);
-		}
-
-		// resys
-		treatment = new Treatment("Resys", resys);
-		treatment = treatmentRepository.save(treatment);
-
-		// anti-reflet
-		for (String ar : typeAR) {
-			treatment = new Treatment(ar, antiReflet);
-			treatment = treatmentRepository.save(treatment);
-		}
-
 	}
 
 	private List<Task> getTaskList(int numOrder, Row row, String supplement) {
@@ -562,27 +407,6 @@ public class SchedulerService {
 		return ResponseEntity.ok().build();
 	}
 
-	private static List<Timeslot> generateTimeSlotList() {
-		List<Timeslot> timeSlotList = new ArrayList<>();
-
-		DayOfWeek startDay = DayOfWeek.MONDAY;
-		DayOfWeek endDay = DayOfWeek.SATURDAY;
-		LocalTime startTime = LocalTime.of(8, 30);
-		LocalTime endTime = LocalTime.of(17, 30);
-
-		DayOfWeek currentDay = startDay;
-		while (currentDay != endDay) {
-			Timeslot timeslot = new Timeslot();
-			timeslot.setDayOfWeek(currentDay);
-			timeslot.setStartTime(startTime);
-			timeslot.setEndTime(endTime);
-			timeSlotList.add(timeslot);
-
-			currentDay = currentDay.plus(1);
-		}
-
-		return timeSlotList;
-	}
 
 	private int taskId;
 
@@ -814,20 +638,7 @@ public class SchedulerService {
 				+ ":" + decimalFormat.format(localDateTime.getSecond());
 	}
 
-	public ResponseEntity<?> updateAutoPlanning(AutoPlanningRequest autoPlanningRequest) {
 
-		System.out.println(autoPlanningRequest);
-		AutoPlanning autoPlanning = new AutoPlanning(autoPlanningRequest);
-		AutoPlanning updatedAutoPlanning;
-		try {
-			updatedAutoPlanning = autoPlanningRepository.save(autoPlanning);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-		return ResponseEntity.ok(updatedAutoPlanning);
-
-	}
 
 	public ResponseEntity<?> deletePlanningById(Long id) {
 
