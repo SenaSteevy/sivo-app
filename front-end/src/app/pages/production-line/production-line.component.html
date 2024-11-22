@@ -1,0 +1,28 @@
+<div class="container" fxFlex fxLayout="column" fxLayoutGap="10px">
+    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
+      <mat-icon>factory</mat-icon>
+      <h3>Production Line</h3>
+    </div>
+
+    <div fxFlex fxLayoutAlign="center">
+      <button class="button" mat-raised-button color="primary" (click)="newPhase()"><mat-icon>add</mat-icon>New Phase</button>
+    </div>
+
+    <div *ngIf="phaseList.length > 0; else empty" cdkDropList (cdkDropListDropped)="drop($event)" fxLayoutGap="20px" fxLayout="column" fxLayoutAlign="center center">
+      <div cdkDrag *ngFor="let phase of phaseList; let i = index" [cdkDragData]="phase" [matBadge]="i" matBadgeSize="large" matBadgePosition="before">
+          <app-phase [phase]="phase"></app-phase>
+      </div>
+    </div>
+
+    <ng-template #empty>
+          <div class="empty">
+            <span>No phase found in production line. Start by adding some production line phases to be able touse the app.</span>
+          </div>
+          <div *ngIf="error" class="error">
+            <span>Oups! An unexpected error occured. Please contact an Administrator if it persist.</span>
+        </div>
+          
+    </ng-template>
+
+</div>
+

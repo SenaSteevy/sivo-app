@@ -1,0 +1,82 @@
+
+<mat-sidenav-container>
+
+  <!-- The side nav -->
+  <mat-sidenav #drawer fixedInViewport="true" mode="over" opened="false">
+    <mat-toolbar color="primary" fxLayout fxLayoutGap="16px">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span> Menu </span>
+    </mat-toolbar>
+    
+    <div class = "side-nav-content">
+      <mat-accordion fxFlex fxLayout="column" fxLayoutAlign="space-between" fxLayoutGap="5px">
+        <mat-expansion-panel *ngFor="let menu of menus" [hideToggle]="menu.items.length == 0" [disabled]="menu.items.length == 0">
+          <mat-expansion-panel-header *ngIf="menu.items.length > 0" class="nav-item">
+            <mat-icon>{{ menu.icon }}</mat-icon>
+            <span style="margin-left: 15px">{{ menu.label }}</span>
+          </mat-expansion-panel-header>
+
+          <mat-expansion-panel-header *ngIf="menu.items.length == 0">
+            <div class="bar" *ngIf="isActive(menu.icon)"></div>
+            <mat-nav-list>
+              <a mat-list-item routerLink="{{ menu.icon }}" (click)="drawer.toggle()"
+              routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" style="width:100%" >  
+                <mat-icon>{{ menu.icon }}</mat-icon>
+                <span style="margin-left: 15px">{{ menu.label }}</span>
+              </a>
+            </mat-nav-list>
+          </mat-expansion-panel-header>
+
+          <mat-nav-list *ngIf="menu.items.length > 0">
+            <a mat-list-item routerLink="{{ item.routerLink }}" (click)="drawer.toggle()"
+            routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" *ngFor="let item of menu.items">
+            <div class="bar" *ngIf="isActive(item.routerLink)"></div>
+            <mat-icon>{{ item.icon }}</mat-icon>
+              <span style="margin-left: 15px">{{ item.label }}</span>
+              <mat-divider></mat-divider>
+            </a>
+          </mat-nav-list>
+        <br>
+      </mat-expansion-panel>
+      <mat-divider></mat-divider>
+    </mat-accordion>
+  </div>
+
+
+  </mat-sidenav>
+  <!-- EO: Side nav-->
+
+  <!-- Side nav content-->
+  <mat-sidenav-content class="content">
+    <mat-toolbar class="toolbar" color="primary">
+      <div fxFlex fxLayout fxLayoutAlign="space-between center" >
+          <button mat-icon-button (click)="drawer.toggle()">
+              <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+          
+          <div class="title">
+            <img src="../assets/images/logo.png" alt="Sivo logo " height="40px" width="90px">
+          </div>
+          
+      </div>
+    </mat-toolbar>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+
+    <footer class="footer">
+      <app-footer></app-footer>
+    </footer>
+
+  </mat-sidenav-content>
+  <!-- EO: Side nav content-->
+
+</mat-sidenav-container>
+
+  
+    
+  
+  

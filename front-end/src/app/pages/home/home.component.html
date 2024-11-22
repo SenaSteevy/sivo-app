@@ -1,0 +1,27 @@
+<div class="lottie" *ngIf="loading; else content" fxFlex fxLayoutAlign="center center">
+     <app-lottie-animation-view  [iconWidth]="'30vw'" [iconHeight]="'10vh'" [animationPath]="'welcome.json'" [loop]="true"></app-lottie-animation-view>
+</div>
+ 
+<ng-template #content>
+    <div class="container" fxFlex fxLayout="column">
+        <div fxFlex="30%" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <mat-icon >home</mat-icon> 
+            <h2 style="display: inline;">Home </h2>
+        </div>
+
+        <div  fxFlex fxLayout="row wrap" fxLayoutGap="20px">
+            <app-card title = "Scheduler" image="../../../assets\images\planner-calendar-schedule-date-concept.jpg" 
+            description="Visualize Schedule or make a new one." icon="date_range" routerLink="/schedules"></app-card>
+            
+            <app-card title = "Planning Simulator" image="../../../assets\images\pharmaceutical-technicians-work-sterile-working-conditions-pharmaceutical-factory-scientists-wearing-protective-clothing.jpg" 
+            description="Test the simulation by uploading an excel file of orders." icon="play_arrow" routerLink="/simulator"></app-card>
+            
+            <app-card title = "Manage Orders" image="../../../assets\images\close-up-signing-package-delivery.jpg" 
+            description="List All the orders received , add more, update or delete anyone." icon="receipt" routerLink="/orders"></app-card>
+    
+            <app-card title = "Production Line" image="../../../assets\images\pharmaceutical-technicians-work-sterile-working-conditions-pharmaceutical-factory-scientists-wearing-protective-clothing.jpg" 
+            description="Set the application parameters. Only for big roles !" icon="factory" routerLink="/production-line"></app-card>
+
+        </div>
+    </div>  
+</ng-template>

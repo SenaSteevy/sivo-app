@@ -1,0 +1,45 @@
+<div class="user-form-container" fxFlex fxLayout.lt-md="column" fxLayoutAlign="start center" fxLayoutGap="10px">
+
+    <div fxFlex="70%" fxFlex fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="5px" >
+      <form [formGroup]="treatmentForm"  (ngSubmit)="saveTreatment()"  fxFlex fxLayout="row wrap" fxLayoutAlign.lt-md="center center" fxLayout.lt-sm="column" fxLayoutGap="5px">
+        
+      
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Description</mat-label>
+          <input matInput type="text" name="Description" placeholder="Description" formControlName = "description" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" >
+          <mat-label>Phase</mat-label>
+          <mat-select formControlName="phase">
+            <mat-option *ngFor="let phase of phaseList" [value]="phase">{{phase.name}}</mat-option>
+
+          </mat-select>
+        </mat-form-field>
+        
+     
+      </form>
+      <mat-error *ngIf="treatmentForm.get('description')?.invalid && treatmentForm.get('description')?.touched">
+        A Description is required.
+      </mat-error>
+      <mat-error *ngIf="treatmentForm.get('phase')?.invalid && treatmentForm.get('phase')?.touched">
+       Select a phase.
+      </mat-error>
+  
+      
+
+      <div class="actions" fxFlex fxLayoutAlign="center center" >
+        <button class="button" *ngIf="!isTreatmentsPage" mat-raised-button  [disabled]="treatmentForm.invalid" type="submit" (click)="saveTreatment()" color="primary">{{!treatment? "Save New Treatment":"Save changes"}}</button>
+        <button class="button" *ngIf="!!treatment && !isTreatmentsPage" mat-raised-button   type="reset" (click)="initializeForm()" color="accent">Reset changes</button>
+        <button class="button" *ngIf="isTreatmentsPage" mat-raised-button color="primary" [routerLink]=" treatment.id+'/edit'">
+          <mat-icon> edit</mat-icon>
+          Edit Treatment
+        </button>
+        <button class="button" *ngIf="isTreatmentsPage" mat-raised-button color="warn" (click)="deleteTreatment()">
+          <mat-icon>delete</mat-icon>
+          Delete Treatment
+        </button>
+      </div>
+    </div>
+</div>
