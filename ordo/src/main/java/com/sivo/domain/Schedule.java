@@ -25,8 +25,6 @@ import lombok.ToString;
 public class Schedule {
 
 	
-	
-
 	@PlanningEntityCollectionProperty
 	private List<Task> tasks;
 	

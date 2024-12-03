@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sivo.domain.Job;
 import com.sivo.request.JobRequest;
+import com.sivo.request.Order;
 import com.sivo.service.SchedulerService;
 
 @RestController
+@CrossOrigin
 public class ScheduleController {
 
 	@Autowired
@@ -78,6 +81,12 @@ public class ScheduleController {
 
 	}
 	
+	@GetMapping("/orders/solve")
+	public ResponseEntity<?> solveOrders(@RequestBody List<Order> orderList ) {
+
+		return schedulerService.solveOrders(orderList);
+
+	}
 	@PostMapping("scheduler/deleteById/{id}")
 	public ResponseEntity<?> deletePlanningById(@PathVariable Long id) {
 

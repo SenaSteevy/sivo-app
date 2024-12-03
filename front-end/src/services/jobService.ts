@@ -33,7 +33,7 @@ export class JobService {
   
   
 
-  private apiUrl = environment.apiUrl+'ordo-service';
+  private apiUrl = environment.apiUrl;
 
 
   constructor(private http: HttpClient) {

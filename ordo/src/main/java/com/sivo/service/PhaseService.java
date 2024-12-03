@@ -1,15 +1,24 @@
 package com.sivo.service;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.sivo.domain.Phase;
+import com.sivo.domain.Treatment;
 import com.sivo.repository.PhaseRepository;
 import com.sivo.repository.TimeslotRepository;
+import com.sivo.repository.TreatmentRepository;
 import com.sivo.request.PhaseRequest;
 import com.sivo.resource.Timeslot;
 
@@ -19,6 +28,9 @@ public class PhaseService {
 	@Autowired
 	PhaseRepository phaseRepository;
 
+	@Autowired
+	TreatmentRepository treatmentRepository;
+	
 	@Autowired
 	TimeslotRepository timeslotRepository;
 
@@ -103,4 +115,78 @@ public class PhaseService {
 		
 		return ResponseEntity.ok(phase.get().getTimeslotList());
 	}
+	
+	@Transactional
+	public void initPhases() {
+	    String[] colors = {"MONOCOLORE", "BICOLORE", "BRUN", "TEINTE", "GRIS", "BLACK", "SUN", "MARRON", "BURGUNDY", "SCOTOVUE", "QUARTZ", "LEMON", "ROSE", "ORANGE"};
+	    String[] AR = {"PREVENCIA", "BLUE", "CRIZAL", "PREMIUM", "ALIZE", "SAPPHIRE", "MIRROR CX", "UV", "DRIVE", "OPTIFOG"};
+	    List<String> colorations = Arrays.asList(colors);
+	    List<String> typeAR = Arrays.asList(AR);
+
+	    List<Phase> phaseList = phaseRepository.findAll();
+	    List<Treatment> treatmentList = treatmentRepository.findAll();
+
+	    if (phaseList.isEmpty() || treatmentList.isEmpty()) {
+	        // Impression
+	        Phase phase = createAndSavePhase("impression", 2, Duration.ofMinutes(1));
+	        createAndSaveTreatment("impression", phase);
+
+	        // Surfaçage
+	        phase = createAndSavePhase("surfaçage", 80, Duration.ofHours(1));
+	        createAndSaveTreatment("surfaçage", phase);
+
+	        // Colorations
+	        phase = createAndSavePhase("coloration", 15, Duration.ofMinutes(30));
+	        for (String coloration : colorations) {
+	            createAndSaveTreatment(coloration, phase);
+	        }
+
+	        // Resys
+	        phase = createAndSavePhase("resys", 120, Duration.ofHours(2));
+	        createAndSaveTreatment("SUPRA", phase);
+
+	        // Anti-Reflet
+	        phase = createAndSavePhase("anti-reflet", 165, Duration.ofHours(3));
+	        for (String aR : typeAR) {
+	            createAndSaveTreatment(aR, phase);
+	        }
+
+	        System.out.println("Production line was initialized to default since no phases were found in DB.");
+	    }
+	}
+
+	private Phase createAndSavePhase(String name, int capacity, Duration duration) {
+	    // Generate a fresh timeslot list for each phase
+	    List<Timeslot> timeslotList = generateAndSaveTimeslotList();
+
+	    // Associate timeslots with the phase before creating the phase
+	    Phase phase = new Phase(name, capacity, duration, timeslotList);
+	    for (Timeslot timeslot : timeslotList) {
+	        timeslot.setPhase(phase); // Set the phase for each timeslot
+	    }
+
+	    // Save the phase along with the timeslots
+	    return phaseRepository.save(phase);
+	}
+
+	private void createAndSaveTreatment(String name, Phase phase) {
+	    Treatment treatment = new Treatment(name, phase);
+	    treatmentRepository.save(treatment);
+	}
+
+	public List<Timeslot> generateAndSaveTimeslotList() {
+	    List<Timeslot> timeslotList = new ArrayList<>();
+
+	    for (DayOfWeek day : DayOfWeek.values()) {
+	        if (day.getValue() >= DayOfWeek.MONDAY.getValue() && day.getValue() <= DayOfWeek.FRIDAY.getValue()) {
+	            timeslotList.add(new Timeslot(day, LocalTime.of(8, 30), LocalTime.of(16, 30)));
+	        } else if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+	            timeslotList.add(new Timeslot(day, LocalTime.of(8, 30), LocalTime.of(12, 30)));
+	        }
+	    }
+
+	    // Persist all timeslots
+	    return timeslotRepository.saveAll(timeslotList);
+	}
+
 }

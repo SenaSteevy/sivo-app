@@ -27,16 +27,16 @@
     <app-lottie-animation-view  [iconWidth]="'8vw'" [iconHeight]="'5vh'" [animationPath]=" 'loading.json'" [loop]="true"></app-lottie-animation-view>
   </div>
 
-  <div class="schedule-list" *ngIf="!!selectedDate" fxFlex fxLayoutAlign="center center" fxFlex fxLayout="column" fxLayoutGap="10px">
+  <div class="schedule-list" *ngIf="!!selectedDate" fxFlex fxLayoutAlign="center center" fxLayout="column" fxLayoutGap="10px">
     <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="1Opx">
       <mat-icon>search</mat-icon>
       <span class="text">Search results</span>
     </div>
 
-    <ng-container *ngIf="filteredPlannings.length == 0 && !loading;" fxFlex fxLayoutAlign="center center">
+    <div *ngIf="filteredPlannings.length == 0 && !loading;" fxFlex fxLayoutAlign="center center">
       <span class="text" style="color:rgb(69, 69, 218)">No result found for this date.</span>
-    </ng-container>
-    <ng-container *ngIf="filteredPlannings.length > 0 && !loading;" >
+    </div>
+    <div *ngIf="filteredPlannings.length > 0 && !loading;" >
       <mat-accordion >
         
         <mat-expansion-panel class="expansionn-panel" #panel  *ngFor="let planning of filteredPlannings; let i = index"  
@@ -47,7 +47,7 @@
         (mouseleave)="stopLottieAnimation(i)">
           <mat-expansion-panel-header>
             <mat-panel-title class="text" >{{ filteredPlannings[i].createdAt | localDateTimeFormat}}</mat-panel-title>
-            <mat-panel-description > <span> Evaluation : </span>
+            <mat-panel-description > <span class="text"> Evaluation : </span>
               <span  [ngClass]="getRateText(plannings[i].rxRate)" >{{ getRateText(plannings[i].rxRate) }}</span>
             </mat-panel-description>
           </mat-expansion-panel-header>
@@ -77,7 +77,7 @@
           </div>
         </mat-expansion-panel>
       </mat-accordion>
-    </ng-container>
+    </div>
   </div>
 
    
@@ -150,7 +150,7 @@
             <mat-panel-title class="text" >{{ planning.createdAt | localDateTimeFormat}}</mat-panel-title>
             <mat-panel-description > 
               <span class="text"> Evaluation : </span>
-              <span [ngClass]="getRateText(plannings[i].rxRate)" >{{ getRateText(planning.rxRate) }}</span>
+              <span [ngClass]="getRateText(plannings[i].rxRate)" >{{ getRateText(plannings[i].rxRate) }}</span>
             </mat-panel-description>
             <button mat-mini-fab color="warn" style="margin-right: 30px;" (click)="deletePlanning(plannings[i])"><mat-icon>delete</mat-icon> </button>
           </mat-expansion-panel-header>

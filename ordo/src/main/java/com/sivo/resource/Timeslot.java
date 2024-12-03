@@ -9,8 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sivo.domain.Phase;
 import com.sivo.request.TimeslotRequest;
 
 import lombok.AllArgsConstructor;
@@ -53,10 +57,23 @@ public class Timeslot implements Serializable {
 	@Column(name = "endTime")
 	private LocalTime endTime;
 	
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "phase_id")	
+    @ToString.Exclude
+    private Phase phase;
+	
 	
     public Timeslot(TimeslotRequest timeslotRequest) {
 		this.dayOfWeek = timeslotRequest.getDayOfWeek();
 		this.startTime = timeslotRequest.getStartTime();
 		this.endTime = timeslotRequest.getEndTime();
+	}
+
+
+	public Timeslot(DayOfWeek dayofWeek, LocalTime startTime, LocalTime endTime) {
+		this.dayOfWeek = dayofWeek;
+		this.startTime = startTime;
+		this.endTime = endTime;
 	}
 }

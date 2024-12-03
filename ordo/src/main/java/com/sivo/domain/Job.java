@@ -96,10 +96,8 @@ public class Job {
 		this.createdAt= jobRequest.getCreatedAt();	}
 
 	public void updateTask(Task task) {
-		
 		this.taskList.remove(task);
-		this.taskList.add(task);
-		
+		this.taskList.add(task);	
 	}
 	
 	// Helper method to add a Task

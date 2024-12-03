@@ -114,13 +114,17 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
   }
    filterPlannings() {   
     this.loading = true
-    this.filteredPlannings = this.plannings.filter(planning =>
-      moment(planning.createdAt).isSame(this.selectedDate, 'day')
-    );
 
-    setTimeout(() => {
-      this.initializeCharts();
-    }, 500);  
+    this.filteredPlannings = this.plannings.filter(planning =>
+      moment(planning.createdAt).isSame(this.selectedDate,'day')
+    );
+    console.log(this.filteredPlannings.length)
+   
+    if(this.filteredPlannings.length > 0){
+      setTimeout(() => {
+        this.initializeCharts();
+      }, 100);  
+    }
     this.loading = false  
   }
 

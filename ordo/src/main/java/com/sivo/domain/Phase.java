@@ -11,7 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -34,7 +33,6 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 
-
 @Entity
 @Table(name = "phase")
 public class Phase implements Serializable {
@@ -46,27 +44,25 @@ public class Phase implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private long id;
-	
+
 	@Include
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
-	
+
 	@Column(name = "capacity")
 	private int capacity;
-	
-	@Column( name = "duration")
+
+	@Column(name = "duration")
 	private Duration duration;
-	
-	
-	@OneToMany(cascade = CascadeType.ALL,orphanRemoval = true, fetch=FetchType.EAGER)
-	@JoinColumn(name = "phase_id")
+
+	@OneToMany(mappedBy = "phase", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Timeslot> timeslotList;
-	
-	@OneToMany(mappedBy = "phase", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
+
+	@OneToMany(mappedBy = "phase", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@JsonIgnore
 	@ToString.Exclude
-    private List<Treatment> treatments;
-	 
+	private List<Treatment> treatments;
+
 	public Phase(PhaseRequest phaseRequest) {
 
 		this.name = phaseRequest.getName();
@@ -76,14 +72,17 @@ public class Phase implements Serializable {
 
 	}
 
-	public Phase(String string, int i, Duration ofMinutes, List<Timeslot> timeslotList2) {
-		this.name = string;
-		this.capacity = i;
-		this.duration = ofMinutes;
-		this.timeslotList = timeslotList2;
+	public Phase(String name, int capacity, Duration duration, List<Timeslot> timeslotList) {
+		this.name = name;
+		this.capacity = capacity;
+		this.duration = duration;
+		this.timeslotList = timeslotList;
 	}
 
-
-	
+	public Phase(String name, int capacity, Duration duration) {
+		this.name = name;
+		this.capacity = capacity;
+		this.duration = duration;
+	}
 
 }

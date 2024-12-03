@@ -4,6 +4,7 @@ import { Treatment } from "./Treatment";
 export interface Task {
     id: number;
     numOrder: number | undefined;
+    leadTime : string;
     treatment: Treatment;
     status: string;
     startTime: string | undefined; 

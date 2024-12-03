@@ -34,9 +34,15 @@
         </ng-container>
 
         <!-- Description Column -->
+        <ng-container matColumnDef="leadTime">
+          <th mat-header-cell *matHeaderCellDef>ORDER LEADTIME</th>
+          <td mat-cell *matCellDef="let task">{{ task.leadTime | durationFormat }}</td>
+        </ng-container>
+
+        <!-- Description Column -->
         <ng-container matColumnDef="description">
           <th mat-header-cell *matHeaderCellDef>DESCRIPTION</th>
-          <td mat-cell *matCellDef="let task">{{ task.description || 'No Description' }}</td>
+          <td mat-cell *matCellDef="let task">{{ task.treatment.description || 'No Description' }}</td>
         </ng-container>
 
 

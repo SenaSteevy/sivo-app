@@ -1,31 +1,36 @@
 <solver>
     <memLimit>2g</memLimit>
+    <environmentMode>FAST_ASSERT</environmentMode>
 
-	<environmentMode>FAST_ASSERT</environmentMode>
+    <!-- Define Solution and Entity classes -->
+    <solutionClass>com.sivo.domain.Schedule</solutionClass>
+    <entityClass>com.sivo.domain.Task</entityClass>
 
+    <!-- Constraint provider class where you define your business rules -->
+    <scoreDirectorFactory>
+        <constraintProviderClass>com.sivo.score.Constraints</constraintProviderClass>
+    </scoreDirectorFactory>
 
-	<solutionClass>com.sivo.domain.Schedule</solutionClass>
-
-	<entityClass>com.sivo.domain.Task</entityClass>
-
-	<scoreDirectorFactory>
-		<constraintProviderClass>com.sivo.score.Constraints
-		</constraintProviderClass>
-	</scoreDirectorFactory>
-
+    <!-- Construction Heuristic Phase -->
     <constructionHeuristic>
         <constructionHeuristicType>SIMPLE_RANDOM</constructionHeuristicType>
     </constructionHeuristic>
+
+    <!-- Local Search Phase (Tabu Search with time limit) -->
     <localSearch>
         <localSearchType>TABU_SEARCH</localSearchType>
         <termination>
             <secondsSpentLimit>60</secondsSpentLimit>
         </termination>
     </localSearch>
+
+    <!-- Acceptors for Tabu Search, defining the Tabu size -->
     <acceptor>
         <entityTabuSize>1000</entityTabuSize>
         <valueTabuSize>1000</valueTabuSize>
     </acceptor>
+
+    <!-- Selector configuration -->
     <selector>
         <entitySorterManner>NONE</entitySorterManner>
         <cacheType>PHASE</cacheType>

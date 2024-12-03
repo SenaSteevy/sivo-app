@@ -45,12 +45,11 @@ public class Treatment {
 	
 	@ManyToOne
 	@JoinColumn(name = "phase_id")
-	@ToString.Exclude
 	private Phase phase;
 	
-	public Treatment(String string, Phase impression) {
-		this.description = string;
-		this.phase = impression;
+	public Treatment(String description, Phase phase) {
+		this.description = description;
+		this.phase = phase;
 	}
 
 	public Treatment(TreatmentRequest treatmentRequest) {

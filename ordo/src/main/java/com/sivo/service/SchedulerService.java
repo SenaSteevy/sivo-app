@@ -7,11 +7,10 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -41,20 +40,18 @@ import com.sivo.domain.Planning;
 import com.sivo.domain.Schedule;
 import com.sivo.domain.Task;
 import com.sivo.domain.Treatment;
-import com.sivo.repository.AutoPlanningRepository;
 import com.sivo.repository.JobRepository;
 import com.sivo.repository.PhaseRepository;
 import com.sivo.repository.PlanningRepository;
 import com.sivo.repository.TaskRepository;
 import com.sivo.repository.TreatmentRepository;
 import com.sivo.request.JobRequest;
+import com.sivo.request.Order;
+import com.sivo.response.OrderResponse;
 
 @Service
 @Transactional
 public class SchedulerService {
-
-	@Autowired
-	AutoPlanningRepository autoPlanningRepository;
 
 	@Autowired
 	JobRepository jobRepository;
@@ -70,23 +67,6 @@ public class SchedulerService {
 
 	@Autowired
 	PlanningRepository planningRepository;
-
-
-
-	String[] colors = { "MONOCOLORE", "BICOLORE", "BRUN", "TEINTE", "GRIS", "BLACK", "SUN", "MARRON", "BURGUNDY",
-			"SCOTOVUE", "QUARTZ", "LEMON", "ROSE", "ORANGE" };
-	List<String> colorations = new ArrayList<String>(Arrays.asList(colors));
-
-	String[] AR = { "PREVENCIA", "BLUE", "CRIZAL", "PREMIUM", "ALIZE", "SAPPHIRE", "MIRROR CX", "UV", "DRIVE",
-			"OPTIFOG" };
-	List<String> typeAR = new ArrayList<String>(Arrays.asList(AR));
-
-	Phase impression;
-	Phase surfacage;
-	Phase coloration;
-	Phase resys;
-	Phase antiReflet;
-
 
 	public Schedule solve(Schedule problem) {
 
@@ -111,9 +91,6 @@ public class SchedulerService {
 	public ResponseEntity<?> solve() {
 		List<Task> taskList = taskRepository.findByStatusIgnoreCaseLike("UNDONE");
 
-		// Check the initial task list size
-		System.out.println("Initial taskList size: " + taskList.size());
-
 		// Delete tasks with no dueDate to clean the database
 		for (Task task : taskList) {
 			if (task.getJob() == null || task.getJob().getDueDate() == null) {
@@ -125,8 +102,6 @@ public class SchedulerService {
 		// Filter the task list for tasks with valid jobs and due dates
 		taskList = taskList.stream().filter(task -> task.getJob() != null && task.getJob().getDueDate() != null)
 				.collect(Collectors.toList());
-
-		System.out.println("Filtered taskList size: " + taskList.size());
 
 		if (taskList.isEmpty()) {
 			System.out.println("taskList empty");
@@ -145,26 +120,17 @@ public class SchedulerService {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No solution found");
 		}
 
-		// Update and save each job with the best solution tasks
-		for (Task task : bestSolution.getTasks()) {
-			Job job = task.getJob();
-			if (job != null) {
-				job.updateTask(task);
-				jobRepository.save(job);
-			}
-		}
-
 		// Retrieve the planning jobs
 		List<Job> planning = getJobList(bestSolution);
-
 		if (planning.isEmpty()) {
 			System.out.println("planning is empty");
+			return ResponseEntity.noContent().build();
 		}
 
 		// Save the planning jobs and return the result
 		Planning solution = new Planning(planning);
 		solution = planningRepository.save(solution);
-		System.out.println("PLANNING DONE: ");
+		System.out.println("Planning done. Orders solved : " + planning.size());
 		return ResponseEntity.ok().body(solution);
 	}
 
@@ -244,7 +210,6 @@ public class SchedulerService {
 		return ResponseEntity.ok().body(jobRepository.findAll());
 	}
 
-
 //	private void resetPhases() {
 //		impression = createPhase("impression", 2, Duration.ofMinutes(2));
 //		surfacage = createPhase("surfaçage", 160, Duration.ofHours(2));
@@ -255,12 +220,13 @@ public class SchedulerService {
 
 	private List<Job> getJobList(Schedule schedule) {
 		List<Job> planning = schedule.getTasks().stream()
-				.filter(task -> "impression".equalsIgnoreCase(task.getPhase().getName()))
+				// .filter(task -> "impression".equalsIgnoreCase(task.getPhase().getName()))
 				.sorted(Comparator.comparing(Task::getStartTime)).map(Task::getJob).distinct() // Ensure unique Jobs are
 																								// collected
 				.collect(Collectors.toList());
 
 		for (Job job : planning) {
+			// Get tasks for each job
 			List<Task> tasks = schedule.getTasks().stream().filter(task -> task.getJob().equals(job))
 					.sorted(Comparator.comparingInt(Task::getPhaseId)).collect(Collectors.toList());
 
@@ -268,22 +234,7 @@ public class SchedulerService {
 				LocalDateTime startDateTime = tasks.get(0).getStartTime();
 				job.setStartDateTime(startDateTime);
 
-				// Remove individual tasks to avoid orphan-related exceptions
-				Iterator<Task> iterator = job.getTaskList().iterator();
-				while (iterator.hasNext()) {
-					Task task = iterator.next();
-					if (!tasks.contains(task)) {
-						iterator.remove();
-					}
-				}
-
-				// Add or update tasks in the existing taskList collection
-				tasks.forEach(task -> {
-					if (!job.getTaskList().contains(task)) {
-						job.getTaskList().add(task);
-					}
-				});
-
+				// Calculate leadTime based on maxPhaseId
 				OptionalInt maxPhaseId = tasks.stream().mapToInt(Task::getPhaseId).max();
 
 				if (maxPhaseId.isPresent()) {
@@ -297,70 +248,53 @@ public class SchedulerService {
 					}
 				}
 
-				// Save the updated job
-				jobRepository.save(job);
 			}
+			for (Task task : tasks) {
+				job.updateTask(task);
+				task.setJob(job);
+			}
+
+			Job newjob = jobRepository.save(job);
 		}
 
-		return planning;
+		// Sort the job list by startDateTime to ensure jobs are in the correct order
+		return planning.stream().sorted(Comparator.comparing(Job::getStartDateTime)).collect(Collectors.toList());
 	}
 
-	private List<Task> getTaskList(int numOrder, Row row, String supplement) {
+	private List<Task> getTaskList(int numOrder, Row row, Job job) {
+
+		List<Phase> phaseList = phaseRepository.findAll();
+		List<Treatment> treatmentList = treatmentRepository.findAll();
+
 		List<Task> taskList = new ArrayList<Task>();
 
 		// impression
 		Treatment treatment = treatmentRepository.findByPhaseName("impression").get(0);
-		taskList.add(new Task(treatment));
+		taskList.add(new Task(treatment, job));
 
 		// surfacage
 		if (row.getCell(3).getStringCellValue().contains("F")) {
 			treatment = treatmentRepository.findByPhaseName("surfaçage").get(0);
-			taskList.add(new Task(treatment));
+			taskList.add(new Task(treatment, job));
 		}
 
-		List<Treatment> treatments = new ArrayList<Treatment>();
-		// coloration
-		for (String color : colorations)
-			if (supplement.toUpperCase().contains(color)) {
-				treatments = treatmentRepository.findByPhaseName("coloration");
+		// coloration, resys et anti-reflet à partir des traitements dans la base de
+		// données
 
-				Optional<Treatment> optionalTreatment = treatments.stream()
-						.filter(item -> item.getDescription().equalsIgnoreCase(color)).findFirst();
+		phaseList.stream().forEach(phase -> {
+			List<Treatment> filteredTreatments = new ArrayList<Treatment>();
+			filteredTreatments = treatmentList.stream().filter(item -> item.getPhase().equals(phase))
+					.collect(Collectors.toList());
+			Optional<Treatment> treatmentFound = filteredTreatments.stream()
+					.filter(item -> job.getSupplement().toUpperCase().contains(item.getDescription().toUpperCase()))
+					.findFirst();
 
-				if (optionalTreatment.isEmpty()) {
-					taskList.add(new Task(treatments.get(0)));
-				} else {
-					taskList.add(new Task(optionalTreatment.get()));
-				}
-				break;
+			if (treatmentFound.isPresent()) {
+				taskList.add(new Task(treatmentFound.get(), job));
+			} else {
+				System.out.println("no treatment found for phase : " + phase.getName() + " numOrder : " + numOrder);
 			}
-
-		// resys
-		if (supplement.toUpperCase().contains("SUPRA"))
-
-		{
-
-			treatment = treatmentRepository.findByPhaseName("resys").get(0);
-			taskList.add(new Task(treatment));
-		}
-
-		// AR
-		for (String type : typeAR)
-			if (supplement.toUpperCase().contains(type)) {
-				treatments = treatmentRepository.findByPhaseName("anti-reflet");
-				if (!treatments.isEmpty()) {
-
-					Optional<Treatment> optionalTreatment = treatments.stream()
-							.filter(item -> item.getDescription().equalsIgnoreCase(type)).findFirst();
-
-					if (optionalTreatment.isEmpty()) {
-						taskList.add(new Task(treatments.get(0)));
-					} else {
-						taskList.add(new Task(optionalTreatment.get()));
-					}
-					break;
-				}
-			}
+		});
 		return taskList;
 	}
 
@@ -406,7 +340,6 @@ public class SchedulerService {
 
 		return ResponseEntity.ok().build();
 	}
-
 
 	private int taskId;
 
@@ -454,7 +387,7 @@ public class SchedulerService {
 			job.setStatus("UNDONE");
 
 			// Get the task list for the job.
-			List<Task> tasks = getTaskList(0, row, job.getSupplement());
+			List<Task> tasks = getTaskList(0, row, job);
 			tasks.stream().forEach(item -> {
 				item.setJob(job);
 				item.setId(this.taskId);
@@ -489,13 +422,14 @@ public class SchedulerService {
 		System.out.println("Calcul : OK");
 		System.out.println("Début de la création du fichier Excel");
 		List<Job> planning = getJobList(schedule);
-		
+
 		List<Task> emptyTasks = new ArrayList<Task>();
-		planning.stream().forEach(job ->  emptyTasks.addAll(job.getTaskList().stream().filter(task -> task.getStartTime() ==null).collect(Collectors.toList())));
-		
-		//emptyTasks.stream().forEach(task -> System.out.println(task) );
-		
-				try {
+		planning.stream().forEach(job -> emptyTasks.addAll(
+				job.getTaskList().stream().filter(task -> task.getStartTime() == null).collect(Collectors.toList())));
+
+		// emptyTasks.stream().forEach(task -> System.out.println(task) );
+
+		try {
 			return exportTaskList(planning, "response");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -638,8 +572,6 @@ public class SchedulerService {
 				+ ":" + decimalFormat.format(localDateTime.getSecond());
 	}
 
-
-
 	public ResponseEntity<?> deletePlanningById(Long id) {
 
 		Optional<Planning> planning = planningRepository.findById(id);
@@ -649,4 +581,105 @@ public class SchedulerService {
 		}
 		return ResponseEntity.notFound().build();
 	}
+
+	public ResponseEntity<?> solveOrders(List<Order> orderList) {
+		try {
+			List<Task> taskList = new ArrayList<>();
+
+			for (Order order : orderList) {
+				List<Task> tasks = getTaskListFromOrder(order);
+				taskList.addAll(tasks);
+			}
+
+			Schedule schedule = new Schedule(taskList);
+			schedule = solve(schedule);
+
+			List<Job> planning = getJobList(schedule);
+//	        planning.forEach( job -> {
+//	        	System.out.println(job.getTaskList().stream().map(Task::getStartTime).collect(Collectors.toList()));
+//	        });
+
+			// Save the planning jobs and return the result
+			Planning solution = new Planning(planning);
+			solution = planningRepository.save(solution);
+			System.out.println("Planning done. Orders solved : " + planning.size());
+
+			List<OrderResponse> response = new ArrayList<OrderResponse>();
+			for (Job job : planning) {
+				response.add(new OrderResponse(job));
+			}
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	private List<Task> getTaskListFromOrder(Order order) {
+
+		Job job = new Job();
+		// Set the job code, description, supplement, type, due date, priority, status,
+		// and created date.
+		job.setNumOrder(order.getNumOrder());
+		job.setCodeOrder(order.getCodeOrder());
+		job.setDescription(order.getDescription());
+		job.setSupplement(order.getSupplement());
+		job.setType(order.getType());
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		job.setCreatedAt(LocalDateTime.parse(order.getCreatedAt(), formatter)); // format "2007-12-03 10:15:30"
+		job.setDueDate(LocalDateTime.parse(order.getDueDate(), formatter)); // format "2007-12-03 10:15:30"
+		job.setPriority(order.getPriority());
+		job.setStatus("UNDONE");
+
+		job = jobRepository.save(job);
+		List<Phase> phaseList = phaseRepository.findAll();
+		List<Treatment> treatmentList = treatmentRepository.findAll();
+
+		List<Task> taskList = new ArrayList<Task>();
+
+		// impression
+		Treatment treatment = treatmentRepository.findByPhaseName("impression").get(0);
+		taskList.add(new Task(treatment, job));
+
+		// surfacage
+		if (order.getType().toUpperCase().contains("F")) {
+			treatment = treatmentRepository.findByPhaseName("surfaçage").get(0);
+			taskList.add(new Task(treatment, job));
+		}
+
+		// coloration, resys et anti-reflet à partir des traitements dans la base de
+		// données
+		phaseList = phaseList.stream().filter(phase -> !phase.getName().equals("impression"))
+				.filter(phase -> !phase.getName().equals("surfaçage")).collect(Collectors.toList());
+		for (Phase phase : phaseList) {
+			List<Treatment> filteredTreatments = new ArrayList<Treatment>();
+			filteredTreatments = treatmentList.stream().filter(item -> item.getPhase().equals(phase))
+					.collect(Collectors.toList());
+			Optional<Treatment> treatmentFound = filteredTreatments.stream()
+					.filter(item -> order.getSupplement().toUpperCase().contains(item.getDescription().toUpperCase()))
+					.findFirst();
+
+			if (treatmentFound.isPresent()) {
+				taskList.add(new Task(treatmentFound.get(), job));
+			} else {
+				// System.out.println("no treatment found for phase : " + phase.getName() + "
+				// numOrder : " + order.getNumOrder());
+			}
+		}
+		;
+
+		taskList = taskRepository.saveAll(taskList);
+
+		job.setTaskList(taskList);
+		for (Task task : taskList) {
+			task.setJob(job);
+		}
+
+		Job savedJob = jobRepository.save(job);
+
+		return taskList;
+	}
+
 }

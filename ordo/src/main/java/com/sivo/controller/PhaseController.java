@@ -2,8 +2,11 @@ package com.sivo.controller;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +21,16 @@ import com.sivo.service.PhaseService;
 
 @RestController
 @RequestMapping("/phases")
+@CrossOrigin
 public class PhaseController {
 	
 	@Autowired
 	PhaseService phaseService;
+	
+	@PostConstruct
+	public void initPhases() {
+		phaseService.initPhases();
+	}
 	
 	@PostMapping("/save")
 	public ResponseEntity<Phase> createPhase(@RequestBody PhaseRequest phaseRequest) {

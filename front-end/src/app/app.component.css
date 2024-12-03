@@ -1,7 +1,10 @@
+.mat-drawer-content{
+    overflow-x:hidden;
 
+}
 mat-sidenav-container{
     position: relative;
-    width:100vw;
+    width:100%;
     height: 100vh;
 }
 mat-accordion{
@@ -42,7 +45,7 @@ mat-sidenav{
 
 .side-nav-content{
     position: flex;
-    width: 100vw;
+    width: 100%;
     height: fit-content;
     overflow: hidden;
 }
@@ -50,7 +53,7 @@ mat-sidenav{
     position:sticky;
     box-shadow: 0px 4px 6px -2px rgba(0, 0, 0, 0.705);
     top:0;
-    width:100vw;
+    width:100%;
     z-index:3;
 }
 .toolBar-button{
@@ -86,6 +89,7 @@ mat-sidenav{
 .content{
     background-color: rgba(229, 229, 231, 0.925);
     width:inherit;
+    overflow-x: auto;
 }
 
 .bar{
@@ -104,7 +108,7 @@ mat-sidenav{
 footer {
     position:relative;
     bottom: 0;
-    width: 100vw;
+    width: 100%;
     background:url("../assets/images/SL-030720-28740-05.jpg");
     background-position-y: bottom;
     height: 200px;
@@ -116,7 +120,11 @@ footer {
     height: 100%;
     object-fit: cover;
     display: flex;
+    position: absolute;
+    left:50%;
+    transform: translateX(-50%);
     align-items: center;
+    justify-self: center;
     cursor: pointer;
     height: 30px;
     z-index: 1;
